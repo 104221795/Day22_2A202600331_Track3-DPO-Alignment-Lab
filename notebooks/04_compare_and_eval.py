@@ -76,6 +76,7 @@ def generate_with_adapter(adapter_path: Path, prompts: list[dict], max_new_token
         max_seq_length=MAX_LEN,
         dtype=None,
         load_in_4bit=True,
+        attn_implementation="sdpa",
     )
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token

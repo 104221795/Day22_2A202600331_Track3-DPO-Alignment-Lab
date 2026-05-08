@@ -78,6 +78,7 @@ model, tokenizer = FastLanguageModel.from_pretrained(
     max_seq_length=MAX_LEN,
     dtype=None,                # auto: bf16 on Ampere+, fp16 on Turing
     load_in_4bit=True,
+    attn_implementation="sdpa",
 )
 
 # Critical for batch training — Qwen tokenizers ship without pad token.

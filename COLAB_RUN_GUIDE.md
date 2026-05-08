@@ -27,6 +27,7 @@ Replace the GitHub URL with your own public repo URL after you push this repo.
 For the safest path, run the patched notebook sources through the Makefile:
 
 ```bash
+%env SFT_DATASET=5CD-AI/Vietnamese-Ecommerce-Alpaca
 !make smoke
 !make pipeline
 ```

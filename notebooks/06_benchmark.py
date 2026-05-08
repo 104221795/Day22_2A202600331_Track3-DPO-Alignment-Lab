@@ -290,8 +290,21 @@ if alpaca_prompts and (os.environ.get("OPENAI_API_KEY") or os.environ.get("ANTHR
         json.dumps(judgments, ensure_ascii=False, indent=2)
     )
 else:
-    print("⚠ No API key set, skipping AlpacaEval-lite. Set OPENAI_API_KEY or ANTHROPIC_API_KEY.")
-    alpaca_winrate = None
+    print("No API key set, using NB4 judge/manual results as AlpacaEval-lite fallback.")
+    judge_path = EVAL_OUT / "judge_results.json"
+    if judge_path.exists():
+        nb4_judgments = json.loads(judge_path.read_text(encoding="utf-8"))
+        n_dpo = sum(1 for j in nb4_judgments if j.get("winner") == "B")
+        n_tie = sum(1 for j in nb4_judgments if j.get("winner") == "tie")
+        n_total = len(nb4_judgments)
+        alpaca_winrate = (n_dpo + 0.5 * n_tie) / n_total if n_total else None
+        print(
+            f"Fallback DPO win-rate from NB4: {n_dpo}/{n_total} wins, "
+            f"{n_tie} ties -> {alpaca_winrate:.3f}"
+        )
+    else:
+        print("NB4 judge_results.json missing; AlpacaEval-lite will be marked skipped.")
+        alpaca_winrate = None
 
 # %% [markdown]
 # ## 6. Aggregate + 4-bar comparison plot

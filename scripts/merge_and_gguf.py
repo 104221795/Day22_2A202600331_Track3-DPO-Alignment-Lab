@@ -54,8 +54,29 @@ def main():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    model = PeftModel.from_pretrained(model, args.sft_path)
+    model = PeftModel.from_pretrained(model, args.sft_path, adapter_name="sft")
     print("Loaded SFT-mini adapter")
+
+    try:
+        model.load_adapter(args.dpo_path, adapter_name="dpo")
+        try:
+            model.set_adapter(["sft", "dpo"])
+            print("Loaded DPO adapter; active adapters: sft + dpo")
+        except TypeError:
+            model.set_adapter("dpo")
+            print("Loaded DPO adapter; active adapter: dpo")
+    except Exception as exc:
+        print(f"WARNING: could not stack DPO adapter ({exc}). Trying DPO-only load.")
+        del model
+        gc.collect()
+        torch.cuda.empty_cache()
+        model, tokenizer = FastLanguageModel.from_pretrained(
+            model_name=base, max_seq_length=max_len, dtype=None, load_in_4bit=True,
+        )
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
+        model = PeftModel.from_pretrained(model, args.dpo_path)
+        print("Loaded DPO adapter directly")
 
     # Step 2: save merged FP16
     model.save_pretrained_merged(

@@ -26,6 +26,10 @@ Build SFT-mini checkpoint → train DPO adapter → compare SFT-only vs SFT+DPO 
 
 [![Open T4 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/<your-username>/Day22-Track3-DPO-Alignment-Lab/blob/main/colab/Lab22_DPO_T4.ipynb)
 
+If your laptop has weak GPU/RAM, use the step-by-step repo workflow in
+[`COLAB_RUN_GUIDE.md`](COLAB_RUN_GUIDE.md). That path runs the patched notebook
+sources through `make pipeline` on a free T4 runtime.
+
 Click → Runtime → Change runtime type → **T4 GPU** → Run all.
 
 **Option 2: Local laptop (≥ 12 GB VRAM)**

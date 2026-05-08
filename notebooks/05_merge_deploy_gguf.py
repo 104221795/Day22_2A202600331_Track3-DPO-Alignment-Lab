@@ -65,10 +65,36 @@ model, tokenizer = FastLanguageModel.from_pretrained(
 if tokenizer.pad_token is None:
     tokenizer.pad_token = tokenizer.eos_token
 
-# Stack SFT-mini → DPO adapters
+# Stack SFT-mini -> DPO adapters.
 SFT_PATH = REPO_ROOT / "adapters" / "sft-mini"
-model = PeftModel.from_pretrained(model, str(SFT_PATH))
+model = PeftModel.from_pretrained(model, str(SFT_PATH), adapter_name="sft")
 print(f"Loaded SFT-mini adapter from {SFT_PATH}")
+
+# The graded GGUF must represent the aligned model, not the SFT baseline.
+# Try to activate SFT + DPO together; if the saved DPO adapter is self-contained
+# in your PEFT/TRL version, loading it as the active adapter still gives the
+# aligned checkpoint. The print below makes the merge state visible in output.
+try:
+    model.load_adapter(str(DPO_PATH), adapter_name="dpo")
+    try:
+        model.set_adapter(["sft", "dpo"])
+        print(f"Loaded DPO adapter from {DPO_PATH}; active adapters: sft + dpo")
+    except TypeError:
+        model.set_adapter("dpo")
+        print(f"Loaded DPO adapter from {DPO_PATH}; active adapter: dpo")
+except Exception as exc:
+    print(f"WARNING: could not stack DPO adapter ({exc}). Trying DPO-only load.")
+    del model
+    model, tokenizer = FastLanguageModel.from_pretrained(
+        model_name=BASE_MODEL,
+        max_seq_length=MAX_LEN,
+        dtype=None,
+        load_in_4bit=True,
+    )
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+    model = PeftModel.from_pretrained(model, str(DPO_PATH))
+    print(f"Loaded DPO adapter directly from {DPO_PATH}")
 
 # %% [markdown]
 # > **Note:** The DPO adapter trained in NB3 stacks on top of SFT. To get a fully

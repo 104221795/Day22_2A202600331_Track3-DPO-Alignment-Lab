@@ -111,21 +111,28 @@ except Exception as exc:
 # converter in step 3.
 
 # %%
-# This re-loads the model with both SFT and DPO adapters merged into base weights.
-# Output is FP16 (or BF16 on Ampere+) HF-format weights ready for inference.
-model.save_pretrained_merged(
-    str(MERGED_PATH),
-    tokenizer,
-    save_method="merged_16bit",
-)
-print(f"Saved merged FP16 to {MERGED_PATH}")
-
-# Free GPU memory before GGUF conversion (which spawns a subprocess that needs RAM)
 import gc
 
-del model
-gc.collect()
-torch.cuda.empty_cache()
+# Try merged FP16 first. Some Colab/Transformers/Unsloth combinations fail here
+# with a `reverse_op` NotImplementedError while converting 4-bit weights. If that
+# happens, keep the live adapter model and export GGUF directly in the next step.
+MERGED_OK = False
+try:
+    model.save_pretrained_merged(
+        str(MERGED_PATH),
+        tokenizer,
+        save_method="merged_16bit",
+    )
+    MERGED_OK = True
+    print(f"Saved merged FP16 to {MERGED_PATH}")
+except NotImplementedError as exc:
+    print(f"WARNING: merged_16bit export failed ({exc.__class__.__name__}).")
+    print("Continuing with direct GGUF export from the loaded adapter model.")
+
+if MERGED_OK:
+    del model
+    gc.collect()
+    torch.cuda.empty_cache()
 
 # %% [markdown]
 # ## 3. Quantize to GGUF Q4_K_M
@@ -138,12 +145,15 @@ torch.cuda.empty_cache()
 # Reload the merged model — Unsloth's GGUF saver expects a live model handle.
 from unsloth import FastLanguageModel as FLM
 
-model, tokenizer = FLM.from_pretrained(
-    model_name=str(MERGED_PATH),
-    max_seq_length=MAX_LEN,
-    dtype=None,
-    load_in_4bit=False,    # already merged; load full precision
-)
+if MERGED_OK:
+    model, tokenizer = FLM.from_pretrained(
+        model_name=str(MERGED_PATH),
+        max_seq_length=MAX_LEN,
+        dtype=None,
+        load_in_4bit=False,    # already merged; load full precision
+    )
+else:
+    print("Using live SFT+DPO adapter model for GGUF export.")
 
 # %%
 # Save GGUF in 1 quantization tier (Q4_K_M). Add more tiers below if you want the

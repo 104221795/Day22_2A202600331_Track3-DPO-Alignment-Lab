@@ -1,0 +1,57 @@
+{
+  "sft_adapter_config": {
+    "exists": true,
+    "path": "/content/lab22/adapters/sft-mini/adapter_config.json",
+    "size_mb": 0.0
+  },
+  "sft_loss_png": {
+    "exists": true,
+    "path": "/content/lab22/submission/screenshots/02_sft_loss.png",
+    "size_mb": 0.04
+  },
+  "pref_train_parquet": {
+    "exists": true,
+    "path": "/content/lab22/data/pref/train.parquet",
+    "size_mb": 4.19
+  },
+  "dpo_adapter_config": {
+    "exists": true,
+    "path": "/content/lab22/adapters/dpo/adapter_config.json",
+    "size_mb": 0.0
+  },
+  "dpo_reward_png": {
+    "exists": true,
+    "path": "/content/lab22/submission/screenshots/03_dpo_reward_curves.png",
+    "size_mb": 0.11
+  },
+  "side_by_side_png": {
+    "exists": true,
+    "path": "/content/lab22/submission/screenshots/04_side_by_side_table.png",
+    "size_mb": 0.08
+  },
+  "gguf_q4": {
+    "exists": true,
+    "path": "/content/lab22/gguf/lab22-dpo-Q4_K_M.gguf",
+    "size_mb": 1929.9
+  },
+  "gguf_smoke_png": {
+    "exists": true,
+    "path": "/content/lab22/submission/screenshots/06_gguf_smoke.png",
+    "size_mb": 0.12
+  },
+  "benchmark_results_json": {
+    "exists": true,
+    "path": "/content/lab22/data/eval/benchmark_results.json",
+    "size_mb": 0.0
+  },
+  "benchmark_plot_png": {
+    "exists": true,
+    "path": "/content/lab22/submission/screenshots/07-benchmark-comparison.png",
+    "size_mb": 0.05
+  },
+  "reflection_md": {
+    "exists": true,
+    "path": "/content/lab22/submission/REFLECTION.md",
+    "size_mb": 0.01
+  }
+}

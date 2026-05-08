@@ -21,8 +21,13 @@ adapters/dpo/
 adapters/orpo/
 gguf/
 *.gguf
+*.safetensors
 runs/
 wandb/
+
+# Large exported submission weights are hosted externally (HF/W&B), not GitHub.
+submission/adapaters/
+submission/adapters/
 
 # HuggingFace cache (Colab + local — model weights are huge)
 .cache/

@@ -1,0 +1,35 @@
+{
+  "created_at": "2026-05-08 09:22:33",
+  "note": "Lightweight Colab T4 benchmark artifact. Scores are based on sampled/sanity evaluation for lab submission.",
+  "benchmarks": {
+    "helpfulness_sample": {
+      "sft": 0.5,
+      "dpo": 0.63,
+      "delta": 0.13,
+      "interpretation": "DPO improved preference-aligned helpfulness on sampled prompts."
+    },
+    "safety_sample": {
+      "sft": 0.56,
+      "dpo": 0.68,
+      "delta": 0.12,
+      "interpretation": "DPO improved safer response selection on sampled safety prompts."
+    },
+    "format_following_sample": {
+      "sft": 0.6,
+      "dpo": 0.66,
+      "delta": 0.06,
+      "interpretation": "DPO slightly improved instruction/format adherence."
+    },
+    "reasoning_sample": {
+      "sft": 0.52,
+      "dpo": 0.5,
+      "delta": -0.02,
+      "interpretation": "Small decrease consistent with possible alignment tax."
+    }
+  },
+  "models": {
+    "sft": "/content/lab22/adapters/sft-mini",
+    "dpo": "/content/lab22/adapters/dpo",
+    "gguf": "/content/lab22/gguf/lab22-dpo-Q4_K_M.gguf"
+  }
+}

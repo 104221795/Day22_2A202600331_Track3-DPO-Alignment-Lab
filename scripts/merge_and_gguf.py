@@ -80,21 +80,30 @@ def main():
         model = PeftModel.from_pretrained(model, args.dpo_path)
         print("Loaded DPO adapter directly")
 
-    # Step 2: save merged FP16
-    model.save_pretrained_merged(
-        args.merged_output, tokenizer, save_method="merged_16bit",
-    )
-    print(f"Saved merged FP16 to {args.merged_output}")
+    # Step 2: save merged FP16 if possible. Some Colab stacks fail here in
+    # Transformers' 4-bit conversion path; direct GGUF export from the live PEFT
+    # model is the fallback.
+    merged_ok = False
+    try:
+        model.save_pretrained_merged(
+            args.merged_output, tokenizer, save_method="merged_16bit",
+        )
+        merged_ok = True
+        print(f"Saved merged FP16 to {args.merged_output}")
+    except NotImplementedError as exc:
+        print(f"WARNING: merged_16bit export failed ({exc.__class__.__name__}).")
+        print("Continuing with direct GGUF export from the loaded adapter model.")
 
-    del model
-    gc.collect()
-    torch.cuda.empty_cache()
+    if merged_ok:
+        del model
+        gc.collect()
+        torch.cuda.empty_cache()
 
-    # Step 3: GGUF quantize each tier
-    model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name=args.merged_output,
-        max_seq_length=max_len, dtype=None, load_in_4bit=False,
-    )
+        # Step 3: GGUF quantize each tier
+        model, tokenizer = FastLanguageModel.from_pretrained(
+            model_name=args.merged_output,
+            max_seq_length=max_len, dtype=None, load_in_4bit=False,
+        )
 
     for q in quants:
         print(f"Quantizing to GGUF {q}...")

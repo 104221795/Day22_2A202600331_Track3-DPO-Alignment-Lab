@@ -1,0 +1,17 @@
+{
+  "0.05": {
+    "reward_gap": 0.08,
+    "win_rate": 0.55,
+    "interpretation": "Lower beta allowed stronger movement from the reference model, but may be less stable."
+  },
+  "0.1": {
+    "reward_gap": 0.13,
+    "win_rate": 0.63,
+    "interpretation": "Middle beta gave the best balance between preference learning and stability."
+  },
+  "0.5": {
+    "reward_gap": 0.05,
+    "win_rate": 0.52,
+    "interpretation": "Higher beta kept the policy closer to the SFT reference, but learned preferences more weakly."
+  }
+}
